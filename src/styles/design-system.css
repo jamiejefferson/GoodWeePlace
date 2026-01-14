@@ -1,0 +1,466 @@
+/* ==========================================================================
+   Design System - Good Wee Place
+   ==========================================================================
+   
+   This design system codifies the visual language and styling patterns
+   used throughout the Good Wee Place application. It is inspired by the
+   minimal aesthetic of Afrika.to.
+   
+   STRUCTURE:
+   - CSS Variables: Design tokens for colors, typography, spacing, and layout
+   - Base Styles: Default styling for HTML elements (h1-h6, p, li, a, button, etc.)
+   - Utility Classes: Reusable component classes for consistent styling
+   - Responsive: Mobile-first responsive adjustments
+   
+   USAGE GUIDELINES:
+   - Use utility classes (.text-body-large, .form-container, etc.) for component styling
+   - Use CSS variables (--font-size-lg, --spacing-md, etc.) for custom styling
+   - Avoid inline styles - prefer utility classes or CSS variables
+   - When creating new components, follow established patterns documented below
+   
+   ========================================================================== */
+
+/* ==========================================================================
+   CSS Variables - Design Tokens
+   ==========================================================================
+   
+   All design values are defined as CSS variables for easy theming and
+   consistency. These can be overridden in specific contexts or for theming.
+   
+   ========================================================================== */
+
+/* Color Variables */
+:root {
+  --color-black: #191919;
+  --color-white: #F2F0EF;
+  --color-trans-blue: #5BCEFA;
+  --color-trans-pink: #F5A9B8;
+  --color-link-blue: #0000FF;
+  
+  /* Spacing Scale - more generous, like Afrika
+   * Use these for consistent spacing throughout the application
+   * Pattern: xs (0.5rem) < sm (1rem) < md (2rem) < lg (4rem) < xl (6rem) < 2xl (8rem)
+   */
+  --spacing-xs: 0.5rem;   /* Small gaps, label margins */
+  --spacing-sm: 1rem;      /* Standard field spacing, list margins */
+  --spacing-md: 2rem;      /* Section padding, container padding */
+  --spacing-lg: 4rem;      /* Large gaps, navigation spacing */
+  --spacing-xl: 6rem;      /* Extra large spacing */
+  --spacing-2xl: 8rem;     /* Maximum spacing, section padding */
+  
+  /* Typography Scale - larger, bolder like Afrika
+   * Font sizes follow a scale: base < lg < xl < 2xl < 3xl < 4xl
+   * Use font-size-lg for body text, larger sizes for headings
+   */
+  --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-size-base: 16px;      /* Base size, used for inputs and small text */
+  --font-size-lg: 1.5rem;       /* Body text, section headings, form text */
+  --font-size-xl: 2rem;         /* h3 headings */
+  --font-size-2xl: 3rem;        /* h2 headings (default) */
+  --font-size-3xl: 4rem;        /* Large h1 (mobile) */
+  --font-size-4xl: 5rem;        /* h1 headings (desktop) */
+  
+  /* Font Weights */
+  --font-weight-normal: 400;     /* Normal weight, form intro text */
+  --font-weight-bold: 700;      /* Bold weight, body text, list items */
+  --font-weight-heavy: 900;     /* Heavy weight, headings, buttons, links */
+  
+  /* Body Text Defaults (can be overridden with utility classes) */
+  --body-font-size: 1.5rem;
+  --body-line-height: 2.2;
+  
+  /* Typography - Body Text Patterns
+   * These values create the tight, consistent line spacing used in
+   * body text throughout the application (see .text-body-large utility class)
+   */
+  --text-line-height-tight: 34px;      /* Tight line height for body text */
+  --text-letter-spacing-tight: -1px;   /* Negative letter spacing for compact text */
+  
+  /* Form Component Patterns
+   * Standard dimensions for all form containers in the application
+   */
+  --form-max-width: 500px;             /* Maximum width for form containers */
+  --form-margin: 2rem 0;                /* Vertical margin for form containers */
+  
+  /* Layout */
+  --max-width: 1400px;
+  --border-width: 0px;
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-black);
+  background-color: var(--color-white);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   Base Typography Styles
+   ==========================================================================
+   
+   Default styling for HTML elements. These provide sensible defaults,
+   but utility classes should be used for component-specific styling.
+   
+   ========================================================================== */
+
+/* Typography - Afrika style: very large, heavy headings, left-aligned
+ * All headings use heavy weight, tight line-height, and left alignment
+ * Note: Use .section-heading utility class for h2 elements that need
+ * font-size-lg instead of the default font-size-2xl
+ */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-heavy);
+  line-height: 1.1;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.02em;
+  text-align: left;
+}
+
+h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: 900;
+}
+
+h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: 500;
+}
+
+h3 {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+}
+
+p {
+  font-size: var(--body-font-size);
+  font-weight: 500;
+  line-height: var(--body-line-height);
+  margin-bottom: var(--spacing-sm);
+  text-align: left;
+}
+
+li {
+  font-size: var(--body-font-size);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--body-line-height);
+}
+
+/* Links - Afrika style: blue, heavy, large */
+a {
+  color: var(--color-trans-blue);
+  text-decoration: none;
+  font-weight: var(--font-weight-heavy);
+  font-size: var(--font-size-lg);
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+/* Buttons - minimal, text-like, Afrika style */
+button {
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-heavy);
+  background-color: transparent;
+  color: var(--color-trans-blue);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: left;
+}
+
+button:hover {
+  opacity: 0.7;
+}
+
+button:active {
+  opacity: 0.5;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Forms - minimal, no borders */
+input, textarea, select {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-black);
+  background-color: var(--color-white);
+  border: none;
+  border-bottom: 1px solid var(--color-black);
+  padding: var(--spacing-xs) 0;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-bottom-color: var(--color-trans-blue);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #999;
+}
+
+/* Layout Utilities - more generous spacing like Afrika */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.section {
+  padding: var(--spacing-2xl) 0;
+}
+
+/* Minimal Navigation - Afrika style */
+nav {
+  padding: var(--spacing-md) 0;
+  border-bottom: none;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--color-trans-blue);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Error States */
+.error {
+  color: var(--color-black);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-xs);
+}
+
+/* Success States */
+.success {
+  color: var(--color-black);
+  margin-top: var(--spacing-sm);
+}
+
+/* Loading States */
+.loading {
+  color: var(--color-black);
+  text-align: center;
+  padding: var(--spacing-md);
+}
+
+/* Hero Section - Responsive Scaling */
+.hero-image {
+  width: 100%;
+  height: auto;
+  max-width: clamp(500px, 50vw, 1000px);
+  margin-bottom: 2rem;
+}
+
+.hero-text {
+  max-width: clamp(600px, 60vw, 1200px);
+  margin-bottom: 2rem;
+  font-size: var(--font-size-lg);
+  line-height: var(--text-line-height-tight);
+  letter-spacing: var(--text-letter-spacing-tight);
+}
+
+/* ==========================================================================
+   Typography Utility Classes
+   ==========================================================================
+   
+   Use these classes for consistent typography across components.
+   These override the default paragraph and list item styles when needed.
+   
+   TYPOGRAPHY PATTERNS:
+   - .text-body-large: Bold, emphasized body text (content paragraphs, list items)
+   - .text-body-large-normal: Normal weight body text (form intros, descriptions)
+   - .section-heading: Smaller h2 headings for sections (uses font-size-lg)
+   
+   ========================================================================== */
+
+/* 
+ * .text-body-large - For large body text with bold weight
+ * Use for: Main content paragraphs, body text that needs emphasis
+ * Typography: font-size-lg, font-weight-bold, line-height 34px, letter-spacing -1px
+ * Examples: WhatItMeansPage paragraphs, list items in content
+ */
+.text-body-large {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--text-line-height-tight);
+  letter-spacing: var(--text-letter-spacing-tight);
+}
+
+/* 
+ * .text-body-large-normal - For large body text with normal weight
+ * Use for: Form intro text, descriptions that should be less emphasized
+ * Typography: font-size-lg, font-weight-normal (400), line-height 34px, letter-spacing -1px
+ */
+.text-body-large-normal {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--text-line-height-tight);
+  letter-spacing: var(--text-letter-spacing-tight);
+}
+
+/* ==========================================================================
+   Form Component Classes
+   ==========================================================================
+   
+   Standardized styling for all form components. Use these classes to ensure
+   consistent form layouts and spacing across the application.
+   
+   FORM PATTERN:
+   1. Wrap form in .form-container (sets max-width and margin)
+   2. Use .section-heading for form title (h2)
+   3. Use .text-body-large-normal for form intro paragraph
+   4. Wrap each field group in .form-field (label + input)
+   5. Use .form-label for all labels
+   
+   Examples: StickerRequestForm, LocationForm, EndorsementForm
+   
+   ========================================================================== */
+
+/* 
+ * .form-container - Standard form wrapper
+ * Use for: All form elements (StickerRequestForm, LocationForm, EndorsementForm)
+ * Layout: max-width 500px, margin 2rem 0
+ * This ensures all forms have consistent width and spacing
+ */
+.form-container {
+  max-width: var(--form-max-width);
+  margin: var(--form-margin);
+}
+
+/* 
+ * .form-field - Wrapper for form field groups (label + input)
+ * Use for: Each form field container
+ * Spacing: margin-bottom 1rem
+ */
+.form-field {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 
+ * .form-label - Standard form label styling
+ * Use for: All form labels
+ * Layout: display block, margin-bottom 0.5rem
+ */
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* ==========================================================================
+   Content List Classes
+   ==========================================================================
+   
+   Styling for lists in content pages. These classes ensure list items
+   match the typography of body text while maintaining proper spacing.
+   
+   LIST PATTERN:
+   - Wrap <ul> in .list-content for proper container spacing
+   - Apply .list-item-content to each <li> for consistent typography
+   
+   Example: WhatItMeansPage commitment list
+   
+   ========================================================================== */
+
+/* 
+ * .list-content - Container for content lists
+ * Use for: Unordered lists in content pages (e.g., WhatItMeansPage)
+ * Layout: margin-left 2rem, margin-top/bottom 1rem
+ * Provides consistent indentation and vertical spacing for content lists
+ */
+.list-content {
+  margin-left: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 
+ * .list-item-content - List items matching body text style
+ * Use for: List items in content that should match body text typography
+ * Typography: Same as .text-body-large
+ * Spacing: margin-bottom 0.5rem
+ */
+.list-item-content {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--text-line-height-tight);
+  letter-spacing: var(--text-letter-spacing-tight);
+}
+
+/* 
+ * .section-heading - Standard section heading (h2)
+ * Use for: Section headings that use font-size-lg instead of default h2 size
+ * Typography: font-size-lg
+ */
+.section-heading {
+  font-size: var(--font-size-lg);
+}
+
+/* ==========================================================================
+   Responsive Design
+   ==========================================================================
+   
+   Mobile-first responsive adjustments. Breakpoint: 768px
+   
+   RESPONSIVE PATTERNS:
+   - Spacing scales down on mobile (smaller gaps)
+   - Typography scales down (smaller font sizes)
+   - Line heights adjust for smaller screens
+   - Navigation and buttons use base font size on mobile
+   
+   ========================================================================== */
+
+/* Responsive */
+@media (max-width: 768px) {
+  :root {
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+    --font-size-4xl: 3rem;
+    --font-size-3xl: 2.5rem;
+    --font-size-2xl: 2rem;
+    --body-font-size: 1.25rem;
+    --body-line-height: 2;
+    --text-line-height-tight: 28px; /* Slightly tighter on mobile */
+  }
+  
+  h1 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+  
+  nav a, button {
+    font-size: var(--font-size-base);
+  }
+}
