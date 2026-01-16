@@ -250,8 +250,22 @@ function Layout({ children }) {
         <div className="container" style={{
           display: 'flex',
           justifyContent: 'flex-end',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: '1.5rem'
         }}>
+          <Link
+            to="/press-release"
+            style={{
+              fontSize: 'var(--font-size-base)',
+              color: 'var(--color-trans-blue)',
+              textDecoration: 'none',
+              transition: 'opacity 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            Press
+          </Link>
           <Link
             to="/admin"
             target="_blank"

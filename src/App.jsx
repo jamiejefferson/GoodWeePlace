@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage'
 import WhatItMeansPage from './pages/WhatItMeansPage'
 import FormsPage from './pages/FormsPage'
 import AdminPage from './pages/AdminPage'
+import PressReleasePage from './pages/PressReleasePage'
 import Layout from './components/Layout'
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Route path="/what-it-means" element={<WhatItMeansPage />} />
           <Route path="/forms" element={<FormsPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/press-release" element={<PressReleasePage />} />
         </Routes>
       </Layout>
     </Router>
