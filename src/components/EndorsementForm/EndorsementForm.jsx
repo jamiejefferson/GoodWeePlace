@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../utils/supabase'
 import { celebrate } from '../../utils/confetti'
 
@@ -10,6 +11,7 @@ function EndorsementForm({ onSuccess }) {
     quote: '',
     logo: null
   })
+  const [consentAccepted, setConsentAccepted] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
@@ -27,6 +29,12 @@ function EndorsementForm({ onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
+
+    if (!consentAccepted) {
+      setError('Please accept the privacy policy to continue.')
+      return
+    }
+
     setSubmitting(true)
 
     try {
@@ -81,6 +89,7 @@ function EndorsementForm({ onSuccess }) {
         quote: '',
         logo: null
       })
+      setConsentAccepted(false)
 
       if (onSuccess) {
         setTimeout(() => {
@@ -182,6 +191,21 @@ function EndorsementForm({ onSuccess }) {
           accept="image/*"
           required
         />
+      </div>
+
+      <div className="form-field">
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={consentAccepted}
+            onChange={(e) => setConsentAccepted(e.target.checked)}
+            required
+            style={{ cursor: 'pointer', flexShrink: 0, maxWidth: '500px', width: '38px' }}
+          />
+          <span className="form-label" style={{ marginBottom: 0 }}>
+            I have read and accept the <Link to="/privacy-policy" style={{ color: 'var(--color-trans-blue)', textDecoration: 'underline', display: 'inline', maxWidth: 'none', width: 'auto' }}>privacy policy</Link>
+          </span>
+        </label>
       </div>
 
       <button type="submit" disabled={submitting || uploading}>

@@ -4,6 +4,7 @@ import WhatItMeansPage from './pages/WhatItMeansPage'
 import FormsPage from './pages/FormsPage'
 import AdminPage from './pages/AdminPage'
 import PressReleasePage from './pages/PressReleasePage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import Layout from './components/Layout'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/forms" element={<FormsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/press-release" element={<PressReleasePage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         </Routes>
       </Layout>
     </Router>

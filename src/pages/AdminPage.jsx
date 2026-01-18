@@ -9,10 +9,13 @@ function AdminPage() {
   const [allVenues, setAllVenues] = useState([])
   const [pendingEndorsements, setPendingEndorsements] = useState([])
   const [stickerRequests, setStickerRequests] = useState([])
+  const [pendingQuotes, setPendingQuotes] = useState([])
+  const [allQuotes, setAllQuotes] = useState([])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [signingIn, setSigningIn] = useState(false)
   const [editingVenue, setEditingVenue] = useState(null)
+  const [editingQuote, setEditingQuote] = useState(null)
   const [editFormData, setEditFormData] = useState({
     name: '',
     address: '',
@@ -21,6 +24,12 @@ function AdminPage() {
     approved: false,
     latitude: '',
     longitude: ''
+  })
+  const [editQuoteData, setEditQuoteData] = useState({
+    quote: '',
+    nickname: '',
+    instagram_handle: '',
+    approved: false
   })
   const [geocoding, setGeocoding] = useState(false)
 
@@ -143,6 +152,21 @@ function AdminPage() {
       console.log('Successfully fetched sticker requests:', requests?.length || 0)
       setStickerRequests(requests || [])
     }
+
+    // Fetch pending quotes
+    const { data: pendingQuotes } = await supabase
+      .from('community_quotes')
+      .select('*')
+      .eq('approved', false)
+      .order('created_at', { ascending: false })
+    setPendingQuotes(pendingQuotes || [])
+
+    // Fetch all quotes (approved and pending)
+    const { data: allQuotes } = await supabase
+      .from('community_quotes')
+      .select('*')
+      .order('created_at', { ascending: false })
+    setAllQuotes(allQuotes || [])
   }
 
   const approveVenue = async (id) => {
@@ -296,6 +320,95 @@ function AdminPage() {
       fetchData()
     } catch (error) {
       alert('Error deleting venue: ' + error.message)
+    }
+  }
+
+  const approveQuote = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('community_quotes')
+        .update({ approved: true })
+        .eq('id', id)
+      if (error) throw error
+      celebrate()
+      fetchData()
+    } catch (error) {
+      alert('Error approving quote: ' + error.message)
+    }
+  }
+
+  const rejectQuote = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('community_quotes')
+        .delete()
+        .eq('id', id)
+      if (error) throw error
+      fetchData()
+    } catch (error) {
+      alert('Error rejecting quote: ' + error.message)
+    }
+  }
+
+  const handleEditQuote = (quote) => {
+    setEditQuoteData({
+      quote: quote.quote || '',
+      nickname: quote.nickname || '',
+      instagram_handle: quote.instagram_handle || '',
+      approved: quote.approved || false
+    })
+    setEditingQuote(quote.id)
+  }
+
+  const handleCancelEditQuote = () => {
+    setEditingQuote(null)
+    setEditQuoteData({
+      quote: '',
+      nickname: '',
+      instagram_handle: '',
+      approved: false
+    })
+  }
+
+  const handleSaveEditQuote = async () => {
+    try {
+      // Clean up Instagram handle
+      const cleanInstagramHandle = editQuoteData.instagram_handle
+        ? editQuoteData.instagram_handle.replace('@', '').trim()
+        : null
+
+      const { error } = await supabase
+        .from('community_quotes')
+        .update({
+          quote: editQuoteData.quote.trim(),
+          nickname: editQuoteData.nickname.trim() || null,
+          instagram_handle: cleanInstagramHandle || null,
+          approved: editQuoteData.approved
+        })
+        .eq('id', editingQuote)
+
+      if (error) throw error
+      celebrate()
+      handleCancelEditQuote()
+      fetchData()
+    } catch (error) {
+      alert('Error updating quote: ' + error.message)
+    }
+  }
+
+  const handleDeleteQuote = async (id) => {
+    if (!confirm('Are you sure you want to delete this quote? This action cannot be undone.')) {
+      return
+    }
+    try {
+      const { error } = await supabase
+        .from('community_quotes')
+        .delete()
+        .eq('id', id)
+      if (error) throw error
+      fetchData()
+    } catch (error) {
+      alert('Error deleting quote: ' + error.message)
     }
   }
 
@@ -532,6 +645,118 @@ function AdminPage() {
                 </div>
               ))}
             </div>
+          )}
+        </section>
+
+        {/* Community Quotes */}
+        <section style={{ marginBottom: '3rem' }}>
+          <h2 className="section-heading">Community Quotes ({allQuotes.length})</h2>
+          {allQuotes.length === 0 ? (
+            <p>No quotes.</p>
+          ) : (
+            <div style={{ marginTop: '1rem' }}>
+              {allQuotes.map((quote) => (
+                <div
+                  key={quote.id}
+                  style={{
+                    border: '1px solid black',
+                    padding: '1rem',
+                    marginBottom: '1rem',
+                    backgroundColor: quote.approved ? '#f0f0f0' : 'white'
+                  }}
+                >
+                  {editingQuote === quote.id ? (
+                    <div>
+                      <div className="form-field">
+                        <label className="form-label">Quote *</label>
+                        <textarea
+                          value={editQuoteData.quote}
+                          onChange={(e) => setEditQuoteData({ ...editQuoteData, quote: e.target.value })}
+                          rows="4"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Nickname</label>
+                        <input
+                          type="text"
+                          value={editQuoteData.nickname}
+                          onChange={(e) => setEditQuoteData({ ...editQuoteData, nickname: e.target.value })}
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Instagram Handle</label>
+                        <input
+                          type="text"
+                          value={editQuoteData.instagram_handle}
+                          onChange={(e) => setEditQuoteData({ ...editQuoteData, instagram_handle: e.target.value })}
+                          placeholder="@handle or handle"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div className="form-field">
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <input
+                            type="checkbox"
+                            checked={editQuoteData.approved}
+                            onChange={(e) => setEditQuoteData({ ...editQuoteData, approved: e.target.checked })}
+                          />
+                          Approved
+                        </label>
+                      </div>
+                      <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                        <button onClick={handleSaveEditQuote}>Save</button>
+                        <button onClick={handleCancelEditQuote}>Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ margin: 0, marginBottom: '0.5rem' }}><strong>Quote:</strong> "{quote.quote}"</p>
+                          {quote.nickname && <p style={{ margin: 0, marginBottom: '0.25rem' }}><strong>Nickname:</strong> {quote.nickname}</p>}
+                          {quote.instagram_handle && (
+                            <p style={{ margin: 0 }}>
+                              <strong>Instagram:</strong>{' '}
+                              <a href={`https://instagram.com/${quote.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer">
+                                @{quote.instagram_handle.replace('@', '')}
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                        <span style={{ 
+                          padding: '0.25rem 0.5rem', 
+                          fontSize: '0.875rem',
+                          backgroundColor: quote.approved ? '#d4edda' : '#fff3cd',
+                          border: '1px solid black'
+                        }}>
+                          {quote.approved ? 'Approved' : 'Pending'}
+                        </span>
+                      </div>
+                      <p><strong>Submitted:</strong> {new Date(quote.created_at).toLocaleDateString()}</p>
+                      <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <button onClick={() => handleEditQuote(quote)}>Edit</button>
+                        {!quote.approved && (
+                          <button onClick={() => approveQuote(quote.id)}>Approve</button>
+                        )}
+                        <button onClick={() => handleDeleteQuote(quote.id)}>Delete</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Pending Quotes (Quick View) */}
+        <section style={{ marginBottom: '3rem' }}>
+          <h2 className="section-heading">Pending Quote Approvals ({pendingQuotes.length})</h2>
+          {pendingQuotes.length === 0 ? (
+            <p>No pending quotes.</p>
+          ) : (
+            <p className="text-body-large-normal">See "Community Quotes" section above to manage pending quotes.</p>
           )}
         </section>
 

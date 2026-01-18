@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import LocationForm from '../components/LocationForm/LocationForm'
 import StickerRequestForm from '../components/StickerRequestForm/StickerRequestForm'
 import EndorsementForm from '../components/EndorsementForm/EndorsementForm'
+import QuoteForm from '../components/QuoteForm/QuoteForm'
 
 function FormsPage() {
   const navigate = useNavigate()
@@ -31,6 +32,9 @@ function FormsPage() {
           )}
           {formType === 'endorsement' && (
             <EndorsementForm onSuccess={handleSuccess} />
+          )}
+          {formType === 'quote' && (
+            <QuoteForm onSuccess={handleSuccess} />
           )}
           {!formType && (
             <div>

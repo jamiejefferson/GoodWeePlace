@@ -30,7 +30,7 @@ function PressReleasePage() {
           
           <div style={{ marginTop: '2rem', paddingLeft: '1rem', borderLeft: '3px solid var(--color-black)' }}>
             <p className="text-body-large">
-              <strong>JJ, founder of Good Wee Place, said:</strong>
+              <strong>Our Founder said:</strong>
             </p>
             <p className="text-body-large" style={{ marginTop: '0.5rem', fontStyle: 'italic' }}>
               "They want us to disappear. To stay home. To stop being visible. Good Wee Place is our answer to that. We're not going anywhere, and neither are the venues, businesses, and communities who stand with us. Glasgow has always been a city that looks after its own. This is us looking after each other."

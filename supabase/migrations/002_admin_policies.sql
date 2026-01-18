@@ -52,5 +52,24 @@ CREATE POLICY "Admins can delete endorsements" ON endorsements
   TO authenticated
   USING (true);
 
+-- Admin can read all community quotes (approved and unapproved)
+CREATE POLICY "Admins can read all community quotes" ON community_quotes
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- Admin can update community quotes (for approval and editing)
+CREATE POLICY "Admins can update community quotes" ON community_quotes
+  FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+-- Admin can delete community quotes (for rejection)
+CREATE POLICY "Admins can delete community quotes" ON community_quotes
+  FOR DELETE
+  TO authenticated
+  USING (true);
+
 -- Note: After running this migration, you'll need to create admin users in Supabase Auth
 -- and ensure they have the 'authenticated' role. You can do this through the Supabase dashboard.

@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../utils/supabase'
 import { celebrate } from '../../utils/confetti'
 
-function StickerRequestForm({ onSuccess }) {
+function QuoteForm({ onSuccess }) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    address: '',
-    message: ''
+    quote: '',
+    nickname: '',
+    instagram_handle: ''
   })
   const [consentAccepted, setConsentAccepted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -32,15 +31,20 @@ function StickerRequestForm({ onSuccess }) {
     setSubmitting(true)
 
     try {
+      // Clean up Instagram handle (remove @ if present)
+      const cleanInstagramHandle = formData.instagram_handle
+        ? formData.instagram_handle.replace('@', '').trim()
+        : null
+
+      // Insert quote
       const { error: insertError } = await supabase
-        .from('sticker_requests')
+        .from('community_quotes')
         .insert([
           {
-            name: formData.name,
-            email: formData.email,
-            address: formData.address,
-            message: formData.message || null,
-            status: 'pending'
+            quote: formData.quote.trim(),
+            nickname: formData.nickname.trim() || null,
+            instagram_handle: cleanInstagramHandle || null,
+            approved: false
           }
         ])
 
@@ -52,10 +56,9 @@ function StickerRequestForm({ onSuccess }) {
 
       // Reset form
       setFormData({
-        name: '',
-        email: '',
-        address: '',
-        message: ''
+        quote: '',
+        nickname: '',
+        instagram_handle: ''
       })
       setConsentAccepted(false)
 
@@ -75,73 +78,60 @@ function StickerRequestForm({ onSuccess }) {
   if (success) {
     return (
       <div className="success">
-        <p>Thank you! Your sticker request has been received. We'll send it to you soon.</p>
+        <p>Thank you! Your quote has been submitted and is pending approval.</p>
       </div>
     )
   }
 
   return (
     <form onSubmit={handleSubmit} className="form-container">
-      <h2 className="section-heading">Get Your Sticker</h2>
+      <h2 className="section-heading">Add Your Voice</h2>
       <p className="text-body-large-normal" style={{ marginBottom: '2rem' }}>
-        Request a free Good Wee Place sticker to display at your venue.
+        Share your thoughts about Good Wee Place and what it means to you.
       </p>
 
       {error && <div className="error">{error}</div>}
 
       <div className="form-field">
-        <label htmlFor="name" className="form-label">
-          Your Name *
+        <label htmlFor="quote" className="form-label">
+          Your Quote *
+        </label>
+        <textarea
+          id="quote"
+          name="quote"
+          value={formData.quote}
+          onChange={handleChange}
+          required
+          rows="6"
+          placeholder="What would you like to say?"
+        />
+      </div>
+
+      <div className="form-field">
+        <label htmlFor="nickname" className="form-label">
+          Nickname (optional)
         </label>
         <input
           type="text"
-          id="name"
-          name="name"
-          value={formData.name}
+          id="nickname"
+          name="nickname"
+          value={formData.nickname}
           onChange={handleChange}
-          required
+          placeholder="How you'd like to be credited"
         />
       </div>
 
       <div className="form-field">
-        <label htmlFor="email" className="form-label">
-          Email *
+        <label htmlFor="instagram_handle" className="form-label">
+          Instagram Handle (optional)
         </label>
         <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
+          type="text"
+          id="instagram_handle"
+          name="instagram_handle"
+          value={formData.instagram_handle}
           onChange={handleChange}
-          required
-        />
-      </div>
-
-      <div className="form-field">
-        <label htmlFor="address" className="form-label">
-          Mailing Address *
-        </label>
-        <textarea
-          id="address"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          required
-          rows="3"
-          placeholder="Where should we send the sticker?"
-        />
-      </div>
-
-      <div className="form-field">
-        <label htmlFor="message" className="form-label">
-          Message (optional)
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          rows="3"
+          placeholder="@yourhandle or yourhandle"
         />
       </div>
 
@@ -161,10 +151,10 @@ function StickerRequestForm({ onSuccess }) {
       </div>
 
       <button type="submit" disabled={submitting}>
-        {submitting ? 'Submitting...' : 'Request Sticker'}
+        {submitting ? 'Submitting...' : 'Submit Quote'}
       </button>
     </form>
   )
 }
 
-export default StickerRequestForm
+export default QuoteForm

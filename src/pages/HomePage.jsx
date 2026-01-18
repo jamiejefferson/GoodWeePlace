@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Map from '../components/Map/Map'
 import EndorsementDisplay from '../components/EndorsementDisplay/EndorsementDisplay'
+import QuoteDisplay from '../components/QuoteDisplay/QuoteDisplay'
 
 function HomePage() {
   const navigate = useNavigate()
@@ -42,6 +43,18 @@ function HomePage() {
         <div className="container">
           <h2 className="section-heading">Find a Good Wee Place</h2>
           <Map />
+        </div>
+      </section>
+
+      {/* Community Quotes Section */}
+      <section className="section">
+        <div className="container">
+          <h2 className="section-heading" style={{ marginBottom: '1rem' }}>From the community</h2>
+          <QuoteDisplay 
+            onEmptyCardClick={() => {
+              navigate('/forms?type=quote')
+            }}
+          />
         </div>
       </section>
 

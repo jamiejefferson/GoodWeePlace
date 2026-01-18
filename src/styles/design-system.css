@@ -374,6 +374,15 @@ nav a {
   margin-bottom: var(--spacing-xs);
 }
 
+/* 
+ * .form-label a - Links inside form labels (e.g., privacy policy links)
+ * Use for: Links within form label text
+ * Typography: font-size 18px (smaller than default link size)
+ */
+.form-label a {
+  font-size: 18px;
+}
+
 /* ==========================================================================
    Content List Classes
    ==========================================================================
