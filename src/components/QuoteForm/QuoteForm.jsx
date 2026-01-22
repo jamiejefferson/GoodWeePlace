@@ -7,7 +7,8 @@ function QuoteForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     quote: '',
     nickname: '',
-    instagram_handle: ''
+    instagram_handle: '',
+    email: ''
   })
   const [consentAccepted, setConsentAccepted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -44,6 +45,7 @@ function QuoteForm({ onSuccess }) {
             quote: formData.quote.trim(),
             nickname: formData.nickname.trim() || null,
             instagram_handle: cleanInstagramHandle || null,
+            email: formData.email.trim() || null,
             approved: false
           }
         ])
@@ -58,7 +60,8 @@ function QuoteForm({ onSuccess }) {
       setFormData({
         quote: '',
         nickname: '',
-        instagram_handle: ''
+        instagram_handle: '',
+        email: ''
       })
       setConsentAccepted(false)
 
@@ -133,6 +136,23 @@ function QuoteForm({ onSuccess }) {
           onChange={handleChange}
           placeholder="@yourhandle or yourhandle"
         />
+      </div>
+
+      <div className="form-field">
+        <label htmlFor="email" className="form-label">
+          Email (optional)
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="your@email.com"
+        />
+        <p style={{ fontSize: '0.875rem', marginTop: '0.25rem', color: '#666' }}>
+          We'll email you when your quote is approved and goes live.
+        </p>
       </div>
 
       <div className="form-field">

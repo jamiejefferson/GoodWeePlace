@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
 import { celebrate } from '../utils/confetti'
+import { sendVenueApprovalEmail, sendQuoteApprovalEmail, sendStickerRequestEmail } from '../utils/email'
 
 function AdminPage() {
   const [user, setUser] = useState(null)
@@ -23,13 +24,15 @@ function AdminPage() {
     website: '',
     approved: false,
     latitude: '',
-    longitude: ''
+    longitude: '',
+    email: ''
   })
   const [editQuoteData, setEditQuoteData] = useState({
     quote: '',
     nickname: '',
     instagram_handle: '',
-    approved: false
+    approved: false,
+    email: ''
   })
   const [geocoding, setGeocoding] = useState(false)
 
@@ -171,11 +174,32 @@ function AdminPage() {
 
   const approveVenue = async (id) => {
     try {
+      // First, fetch the venue to get the email address
+      const { data: venue, error: fetchError } = await supabase
+        .from('venues')
+        .select('email, name')
+        .eq('id', id)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      // Update the venue to approved
       const { error } = await supabase
         .from('venues')
         .update({ approved: true })
         .eq('id', id)
       if (error) throw error
+
+      // Send email notification if email is available
+      if (venue?.email) {
+        try {
+          await sendVenueApprovalEmail(venue.email, venue.name)
+        } catch (emailError) {
+          console.error('Error sending approval email:', emailError)
+          // Don't fail the approval if email fails
+        }
+      }
+
       celebrate()
       fetchData()
     } catch (error) {
@@ -225,14 +249,60 @@ function AdminPage() {
 
   const updateStickerRequestStatus = async (id, status) => {
     try {
+      // If marking as 'sent', fetch the request to get email and name
+      if (status === 'sent') {
+        const { data: request, error: fetchError } = await supabase
+          .from('sticker_requests')
+          .select('email, name')
+          .eq('id', id)
+          .single()
+
+        if (fetchError) throw fetchError
+
+        // Update the status
+        const { error } = await supabase
+          .from('sticker_requests')
+          .update({ status })
+          .eq('id', id)
+        if (error) throw error
+
+        // Send email notification if email is available
+        if (request?.email) {
+          try {
+            await sendStickerRequestEmail(request.email, request.name)
+          } catch (emailError) {
+            console.error('Error sending sticker request email:', emailError)
+            // Don't fail the status update if email fails
+          }
+        }
+      } else {
+        // For other status updates, just update the status
+        const { error } = await supabase
+          .from('sticker_requests')
+          .update({ status })
+          .eq('id', id)
+        if (error) throw error
+      }
+
+      fetchData()
+    } catch (error) {
+      alert('Error updating status: ' + error.message)
+    }
+  }
+
+  const handleDeleteStickerRequest = async (id) => {
+    if (!confirm('Are you sure you want to delete this sticker request? This action cannot be undone.')) {
+      return
+    }
+    try {
       const { error } = await supabase
         .from('sticker_requests')
-        .update({ status })
+        .delete()
         .eq('id', id)
       if (error) throw error
       fetchData()
     } catch (error) {
-      alert('Error updating status: ' + error.message)
+      alert('Error deleting sticker request: ' + error.message)
     }
   }
 
@@ -244,7 +314,8 @@ function AdminPage() {
       website: venue.website || '',
       approved: venue.approved || false,
       latitude: venue.latitude || '',
-      longitude: venue.longitude || ''
+      longitude: venue.longitude || '',
+      email: venue.email || ''
     })
     setEditingVenue(venue.id)
   }
@@ -279,12 +350,23 @@ function AdminPage() {
       website: '',
       approved: false,
       latitude: '',
-      longitude: ''
+      longitude: '',
+      email: ''
     })
   }
 
   const handleSaveEdit = async () => {
     try {
+      // Check if we're approving (changing from unapproved to approved)
+      const { data: currentVenue } = await supabase
+        .from('venues')
+        .select('approved, email')
+        .eq('id', editingVenue)
+        .single()
+
+      const isBeingApproved = !currentVenue?.approved && editFormData.approved
+
+      // Update the venue
       const { error } = await supabase
         .from('venues')
         .update({
@@ -292,6 +374,7 @@ function AdminPage() {
           address: editFormData.address,
           description: editFormData.description || null,
           website: editFormData.website || null,
+          email: editFormData.email.trim() || null,
           approved: editFormData.approved,
           latitude: parseFloat(editFormData.latitude),
           longitude: parseFloat(editFormData.longitude)
@@ -299,6 +382,18 @@ function AdminPage() {
         .eq('id', editingVenue)
 
       if (error) throw error
+
+      // Send email notification if being approved and email is available
+      if (isBeingApproved && (editFormData.email || currentVenue?.email)) {
+        const emailToUse = editFormData.email || currentVenue?.email
+        try {
+          await sendVenueApprovalEmail(emailToUse, editFormData.name)
+        } catch (emailError) {
+          console.error('Error sending approval email:', emailError)
+          // Don't fail the update if email fails
+        }
+      }
+
       celebrate()
       handleCancelEdit()
       fetchData()
@@ -325,11 +420,32 @@ function AdminPage() {
 
   const approveQuote = async (id) => {
     try {
+      // First, fetch the quote to get the email address
+      const { data: quote, error: fetchError } = await supabase
+        .from('community_quotes')
+        .select('email')
+        .eq('id', id)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      // Update the quote to approved
       const { error } = await supabase
         .from('community_quotes')
         .update({ approved: true })
         .eq('id', id)
       if (error) throw error
+
+      // Send email notification if email is available
+      if (quote?.email) {
+        try {
+          await sendQuoteApprovalEmail(quote.email)
+        } catch (emailError) {
+          console.error('Error sending approval email:', emailError)
+          // Don't fail the approval if email fails
+        }
+      }
+
       celebrate()
       fetchData()
     } catch (error) {
@@ -355,7 +471,8 @@ function AdminPage() {
       quote: quote.quote || '',
       nickname: quote.nickname || '',
       instagram_handle: quote.instagram_handle || '',
-      approved: quote.approved || false
+      approved: quote.approved || false,
+      email: quote.email || ''
     })
     setEditingQuote(quote.id)
   }
@@ -366,28 +483,52 @@ function AdminPage() {
       quote: '',
       nickname: '',
       instagram_handle: '',
-      approved: false
+      approved: false,
+      email: ''
     })
   }
 
   const handleSaveEditQuote = async () => {
     try {
+      // Check if we're approving (changing from unapproved to approved)
+      const { data: currentQuote } = await supabase
+        .from('community_quotes')
+        .select('approved, email')
+        .eq('id', editingQuote)
+        .single()
+
+      const isBeingApproved = !currentQuote?.approved && editQuoteData.approved
+
       // Clean up Instagram handle
       const cleanInstagramHandle = editQuoteData.instagram_handle
         ? editQuoteData.instagram_handle.replace('@', '').trim()
         : null
 
+      // Update the quote
       const { error } = await supabase
         .from('community_quotes')
         .update({
           quote: editQuoteData.quote.trim(),
           nickname: editQuoteData.nickname.trim() || null,
           instagram_handle: cleanInstagramHandle || null,
+          email: editQuoteData.email.trim() || null,
           approved: editQuoteData.approved
         })
         .eq('id', editingQuote)
 
       if (error) throw error
+
+      // Send email notification if being approved and email is available
+      if (isBeingApproved && (editQuoteData.email || currentQuote?.email)) {
+        const emailToUse = editQuoteData.email || currentQuote?.email
+        try {
+          await sendQuoteApprovalEmail(emailToUse)
+        } catch (emailError) {
+          console.error('Error sending approval email:', emailError)
+          // Don't fail the update if email fails
+        }
+      }
+
       celebrate()
       handleCancelEditQuote()
       fetchData()
@@ -547,6 +688,16 @@ function AdminPage() {
                         />
                       </div>
                       <div className="form-field">
+                        <label className="form-label">Email</label>
+                        <input
+                          type="email"
+                          value={editFormData.email}
+                          onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                          placeholder="venue@example.com"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div className="form-field">
                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <input
                             type="checkbox"
@@ -578,6 +729,7 @@ function AdminPage() {
                       <p><strong>Coordinates:</strong> {venue.latitude}, {venue.longitude}</p>
                       {venue.description && <p><strong>Description:</strong> {venue.description}</p>}
                       {venue.website && <p><strong>Website:</strong> <a href={venue.website} target="_blank" rel="noopener noreferrer">{venue.website}</a></p>}
+                      {venue.email && <p><strong>Email:</strong> {venue.email}</p>}
                       {venue.sticker_photo_url && (
                         <img
                           src={venue.sticker_photo_url}
@@ -696,6 +848,16 @@ function AdminPage() {
                         />
                       </div>
                       <div className="form-field">
+                        <label className="form-label">Email</label>
+                        <input
+                          type="email"
+                          value={editQuoteData.email}
+                          onChange={(e) => setEditQuoteData({ ...editQuoteData, email: e.target.value })}
+                          placeholder="quote@example.com"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div className="form-field">
                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <input
                             type="checkbox"
@@ -717,11 +879,16 @@ function AdminPage() {
                           <p style={{ margin: 0, marginBottom: '0.5rem' }}><strong>Quote:</strong> "{quote.quote}"</p>
                           {quote.nickname && <p style={{ margin: 0, marginBottom: '0.25rem' }}><strong>Nickname:</strong> {quote.nickname}</p>}
                           {quote.instagram_handle && (
-                            <p style={{ margin: 0 }}>
+                            <p style={{ margin: 0, marginBottom: '0.25rem' }}>
                               <strong>Instagram:</strong>{' '}
                               <a href={`https://instagram.com/${quote.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer">
                                 @{quote.instagram_handle.replace('@', '')}
                               </a>
+                            </p>
+                          )}
+                          {quote.email && (
+                            <p style={{ margin: 0 }}>
+                              <strong>Email:</strong> {quote.email}
                             </p>
                           )}
                         </div>
@@ -782,7 +949,7 @@ function AdminPage() {
                   {request.message && <p><strong>Message:</strong> {request.message}</p>}
                   <p><strong>Status:</strong> {request.status}</p>
                   <p><strong>Requested:</strong> {new Date(request.created_at).toLocaleDateString()}</p>
-                  <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                  <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                     <button onClick={() => updateStickerRequestStatus(request.id, 'pending')}>
                       Mark Pending
                     </button>
@@ -791,6 +958,12 @@ function AdminPage() {
                     </button>
                     <button onClick={() => updateStickerRequestStatus(request.id, 'fulfilled')}>
                       Mark Fulfilled
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteStickerRequest(request.id)}
+                      style={{ color: 'var(--color-trans-blue)' }}
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>

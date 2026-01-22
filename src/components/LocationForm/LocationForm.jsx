@@ -12,6 +12,7 @@ function LocationForm({ onSuccess }) {
     longitude: '',
     description: '',
     website: '',
+    email: '',
     sticker_photo: null
   })
   const [consentAccepted, setConsentAccepted] = useState(false)
@@ -161,6 +162,7 @@ function LocationForm({ onSuccess }) {
             longitude: coords.lon,
             description: formData.description || null,
             website: websiteUrl,
+            email: formData.email.trim() || null,
             sticker_photo_url: stickerPhotoUrl,
             approved: false
           }
@@ -180,6 +182,7 @@ function LocationForm({ onSuccess }) {
         longitude: '',
         description: '',
         website: '',
+        email: '',
         sticker_photo: null
       })
       setConsentAccepted(false)
@@ -269,6 +272,23 @@ function LocationForm({ onSuccess }) {
           onChange={handleChange}
           placeholder="https://example.com"
         />
+      </div>
+
+      <div className="form-field">
+        <label htmlFor="email" className="form-label">
+          Email (optional)
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="your@email.com"
+        />
+        <p style={{ fontSize: '0.875rem', marginTop: '0.25rem', color: '#666' }}>
+          We'll email you when your venue is approved and goes live.
+        </p>
       </div>
 
       <div className="form-field">
