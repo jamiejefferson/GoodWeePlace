@@ -57,8 +57,8 @@ function QuoteDisplay({ onEmptyCardClick }) {
         <div
           onClick={onEmptyCardClick}
           style={{
-            minWidth: '280px',
-            width: '280px',
+            minWidth: '420px',
+            width: '420px',
             backgroundColor: '#000',
             display: 'flex',
             flexDirection: 'column',
@@ -104,8 +104,8 @@ function QuoteDisplay({ onEmptyCardClick }) {
           <div
             key={quote.id}
             style={{
-              minWidth: '280px',
-              width: '280px',
+              minWidth: '420px',
+              width: '420px',
               backgroundColor: '#fff',
               border: '1px solid #000',
               padding: '1.5rem',
@@ -115,7 +115,7 @@ function QuoteDisplay({ onEmptyCardClick }) {
               gap: '0.75rem'
             }}
           >
-            <p className="text-body-large" style={{ margin: 0 }}>
+            <p className="text-body-large" style={{ margin: 0, fontSize: '1.25rem' }}>
               "{quote.quote}"
             </p>
             {(quote.nickname || quote.instagram_handle) && (

@@ -308,10 +308,10 @@ nav a {
  * Examples: WhatItMeansPage paragraphs, list items in content
  */
 .text-body-large {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--text-line-height-tight);
-  letter-spacing: var(--text-letter-spacing-tight);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 25px;
+  letter-spacing: 0px;
 }
 
 /* 

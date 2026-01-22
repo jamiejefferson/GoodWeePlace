@@ -60,12 +60,51 @@ Then login with:
 - Email: `jj@eqtr.com`
 - Password: `GWP2026!`
 
+## Restarting the Application
+
+To restart the app after closing it:
+
+1. **Navigate to project:**
+   ```bash
+   cd /path/to/GoodWeePlace
+   ```
+
+2. **Verify `.env` file exists:**
+   - Check it's in the project root
+   - Verify it has all three variables with actual values
+
+3. **Start the server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Test:**
+   - Open `http://localhost:5173`
+   - Check browser console (F12) for errors
+
+**Note:** You don't need to run `npm install` again unless `node_modules` is missing.
+
 ## Troubleshooting
 
-If you see "Missing Supabase environment variables":
+### "Missing Supabase environment variables" error
+
+**Local:**
 1. Check that `.env` file exists in project root
-2. Verify all three variables are set with actual values (not placeholders)
+2. Verify all three variables are set with actual values (not placeholders):
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
 3. Restart the dev server: Stop it (Ctrl+C) and run `npm run dev` again
+
+**Production (Vercel):**
+- Add environment variables in Vercel Dashboard → Settings → Environment Variables
+- Redeploy after adding variables
+
+### App won't start
+- Verify Node.js is installed: `node --version` (should be 16+)
+- Check `.env` file exists and has correct values
+- Try: `npm install` to reinstall dependencies
+- Check terminal for specific error messages
 
 ## Full Documentation
 
