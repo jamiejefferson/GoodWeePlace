@@ -13,6 +13,7 @@ function LocationForm({ onSuccess }) {
     description: '',
     website: '',
     email: '',
+    instagram_handle: '',
     sticker_photo: null
   })
   const [consentAccepted, setConsentAccepted] = useState(false)
@@ -151,6 +152,11 @@ function LocationForm({ onSuccess }) {
         websiteUrl = `https://${websiteUrl}`
       }
 
+      // Clean up Instagram handle (remove @ if present)
+      const cleanInstagramHandle = formData.instagram_handle
+        ? formData.instagram_handle.replace('@', '').trim()
+        : null
+
       // Insert venue
       const { error: insertError } = await supabase
         .from('venues')
@@ -163,6 +169,7 @@ function LocationForm({ onSuccess }) {
             description: formData.description || null,
             website: websiteUrl,
             email: formData.email.trim() || null,
+            instagram_handle: cleanInstagramHandle || null,
             sticker_photo_url: stickerPhotoUrl,
             approved: false
           }
@@ -183,6 +190,7 @@ function LocationForm({ onSuccess }) {
         description: '',
         website: '',
         email: '',
+        instagram_handle: '',
         sticker_photo: null
       })
       setConsentAccepted(false)
@@ -288,6 +296,23 @@ function LocationForm({ onSuccess }) {
         />
         <p style={{ fontSize: '0.875rem', marginTop: '0.25rem', color: '#666' }}>
           We'll email you when your venue is approved and goes live.
+        </p>
+      </div>
+
+      <div className="form-field">
+        <label htmlFor="instagram_handle" className="form-label">
+          Instagram Handle (optional)
+        </label>
+        <input
+          type="text"
+          id="instagram_handle"
+          name="instagram_handle"
+          value={formData.instagram_handle}
+          onChange={handleChange}
+          placeholder="@yourvenue"
+        />
+        <p style={{ fontSize: '0.875rem', marginTop: '0.25rem', color: '#666' }}>
+          We'll tag you when we share your venue on Instagram.
         </p>
       </div>
 

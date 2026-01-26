@@ -13,8 +13,12 @@
 export function generateInstagramCaption(venue) {
   const lines = []
 
-  // Title line
-  lines.push(`Introducing ${venue.name} - a Good Wee Place!`)
+  // Title line - include Instagram handle if available
+  if (venue.instagram_handle) {
+    lines.push(`Introducing @${venue.instagram_handle.replace('@', '')} - a Good Wee Place!`)
+  } else {
+    lines.push(`Introducing ${venue.name} - a Good Wee Place!`)
+  }
   lines.push('')
 
   // Description if available

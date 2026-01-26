@@ -27,7 +27,8 @@ function AdminPage() {
     approved: false,
     latitude: '',
     longitude: '',
-    email: ''
+    email: '',
+    instagram_handle: ''
   })
   const [editQuoteData, setEditQuoteData] = useState({
     quote: '',
@@ -317,7 +318,8 @@ function AdminPage() {
       approved: venue.approved || false,
       latitude: venue.latitude || '',
       longitude: venue.longitude || '',
-      email: venue.email || ''
+      email: venue.email || '',
+      instagram_handle: venue.instagram_handle || ''
     })
     setEditingVenue(venue.id)
   }
@@ -353,7 +355,8 @@ function AdminPage() {
       approved: false,
       latitude: '',
       longitude: '',
-      email: ''
+      email: '',
+      instagram_handle: ''
     })
   }
 
@@ -368,6 +371,11 @@ function AdminPage() {
 
       const isBeingApproved = !currentVenue?.approved && editFormData.approved
 
+      // Clean up Instagram handle
+      const cleanInstagramHandle = editFormData.instagram_handle
+        ? editFormData.instagram_handle.replace('@', '').trim()
+        : null
+
       // Update the venue
       const { error } = await supabase
         .from('venues')
@@ -377,6 +385,7 @@ function AdminPage() {
           description: editFormData.description || null,
           website: editFormData.website || null,
           email: editFormData.email.trim() || null,
+          instagram_handle: cleanInstagramHandle || null,
           approved: editFormData.approved,
           latitude: parseFloat(editFormData.latitude),
           longitude: parseFloat(editFormData.longitude)
@@ -717,6 +726,16 @@ function AdminPage() {
                         />
                       </div>
                       <div className="form-field">
+                        <label className="form-label">Instagram Handle</label>
+                        <input
+                          type="text"
+                          value={editFormData.instagram_handle}
+                          onChange={(e) => setEditFormData({ ...editFormData, instagram_handle: e.target.value })}
+                          placeholder="@handle or handle"
+                          style={{ width: '100%' }}
+                        />
+                      </div>
+                      <div className="form-field">
                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <input
                             type="checkbox"
@@ -749,6 +768,14 @@ function AdminPage() {
                       {venue.description && <p><strong>Description:</strong> {venue.description}</p>}
                       {venue.website && <p><strong>Website:</strong> <a href={venue.website} target="_blank" rel="noopener noreferrer">{venue.website}</a></p>}
                       {venue.email && <p><strong>Email:</strong> {venue.email}</p>}
+                      {venue.instagram_handle && (
+                        <p>
+                          <strong>Instagram:</strong>{' '}
+                          <a href={`https://instagram.com/${venue.instagram_handle}`} target="_blank" rel="noopener noreferrer">
+                            @{venue.instagram_handle}
+                          </a>
+                        </p>
+                      )}
                       {venue.sticker_photo_url && (
                         <img
                           src={venue.sticker_photo_url}
