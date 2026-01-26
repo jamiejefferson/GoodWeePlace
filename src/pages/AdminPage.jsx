@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
 import { celebrate } from '../utils/confetti'
 import { sendVenueApprovalEmail, sendQuoteApprovalEmail, sendStickerRequestEmail } from '../utils/email'
+import { shareToInstagram } from '../utils/instagramShare'
 import EditableMap from '../components/Map/EditableMap'
 
 function AdminPage() {
@@ -419,6 +420,11 @@ function AdminPage() {
     }
   }
 
+  const handleShareToInstagram = async (venue) => {
+    const result = await shareToInstagram(venue)
+    alert(result.message)
+  }
+
   const approveQuote = async (id) => {
     try {
       // First, fetch the quote to get the email address
@@ -755,6 +761,14 @@ function AdminPage() {
                         <button onClick={() => handleEditVenue(venue)}>Edit</button>
                         {!venue.approved && (
                           <button onClick={() => approveVenue(venue.id)}>Approve</button>
+                        )}
+                        {venue.approved && (
+                          <button
+                            onClick={() => handleShareToInstagram(venue)}
+                            style={{ backgroundColor: '#E1306C', color: 'white' }}
+                          >
+                            Share to Instagram
+                          </button>
                         )}
                         <button onClick={() => handleDeleteVenue(venue.id)}>Delete</button>
                       </div>
