@@ -53,52 +53,6 @@ function QuoteDisplay({ onEmptyCardClick }) {
           }
         }}
       >
-        {/* Empty card with plus sign - always first */}
-        <div
-          onClick={onEmptyCardClick}
-          style={{
-            minWidth: '420px',
-            width: '420px',
-            backgroundColor: '#000',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            flexShrink: 0,
-            padding: '2rem',
-            transition: 'opacity 0.2s',
-            gap: '0.5rem'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.8'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '1'
-          }}
-        >
-          <span
-            style={{
-              color: '#fff',
-              fontSize: '3rem',
-              fontWeight: '300',
-              lineHeight: '1'
-            }}
-          >
-            +
-          </span>
-          <span
-            style={{
-              color: '#fff',
-              fontSize: 'var(--font-size-base)',
-              fontWeight: 'var(--font-weight-bold)',
-              textAlign: 'center'
-            }}
-          >
-            Add your voice
-          </span>
-        </div>
-
         {/* Quote cards */}
         {quotes.map((quote) => (
           <div
@@ -148,6 +102,52 @@ function QuoteDisplay({ onEmptyCardClick }) {
             )}
           </div>
         ))}
+
+        {/* Empty card with plus sign - at end */}
+        <div
+          onClick={onEmptyCardClick}
+          style={{
+            minWidth: '420px',
+            width: '420px',
+            backgroundColor: '#000',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            flexShrink: 0,
+            padding: '2rem',
+            transition: 'opacity 0.2s',
+            gap: '0.5rem'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.8'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '1'
+          }}
+        >
+          <span
+            style={{
+              color: '#fff',
+              fontSize: '3rem',
+              fontWeight: '300',
+              lineHeight: '1'
+            }}
+          >
+            +
+          </span>
+          <span
+            style={{
+              color: '#fff',
+              fontSize: 'var(--font-size-base)',
+              fontWeight: 'var(--font-weight-bold)',
+              textAlign: 'center'
+            }}
+          >
+            Add your voice
+          </span>
+        </div>
       </div>
     </div>
   )

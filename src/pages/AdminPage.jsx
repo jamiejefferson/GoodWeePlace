@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
 import { celebrate } from '../utils/confetti'
 import { sendVenueApprovalEmail, sendQuoteApprovalEmail, sendStickerRequestEmail } from '../utils/email'
+import EditableMap from '../components/Map/EditableMap'
 
 function AdminPage() {
   const [user, setUser] = useState(null)
@@ -647,6 +648,18 @@ function AdminPage() {
                         >
                           {geocoding ? 'Geocoding...' : 'Re-geocode Address'}
                         </button>
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Map Location</label>
+                        <EditableMap
+                          latitude={editFormData.latitude}
+                          longitude={editFormData.longitude}
+                          onPositionChange={(lat, lng) => setEditFormData({
+                            ...editFormData,
+                            latitude: lat,
+                            longitude: lng
+                          })}
+                        />
                       </div>
                       <div className="form-field">
                         <label className="form-label">Latitude *</label>
