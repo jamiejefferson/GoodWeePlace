@@ -58,8 +58,8 @@ function QuoteDisplay({ onEmptyCardClick }) {
           <div
             key={quote.id}
             style={{
-              minWidth: '420px',
-              width: '420px',
+              minWidth: '357px',
+              width: '357px',
               backgroundColor: '#fff',
               border: '1px solid #000',
               padding: '1.5rem',
@@ -107,8 +107,8 @@ function QuoteDisplay({ onEmptyCardClick }) {
         <div
           onClick={onEmptyCardClick}
           style={{
-            minWidth: '420px',
-            width: '420px',
+            minWidth: '357px',
+            width: '357px',
             backgroundColor: '#000',
             display: 'flex',
             flexDirection: 'column',
