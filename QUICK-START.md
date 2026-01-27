@@ -23,7 +23,13 @@ VITE_SUPABASE_ANON_KEY=your_actual_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_actual_service_role_key
 ```
 
-**Get these from:** Supabase Dashboard → Settings → API
+Optional, for email notifications (venue/quote approval, sticker “sent”):
+```bash
+VITE_RESEND_API_KEY=re_your_resend_api_key
+```
+See `EMAIL-SETUP.md` for Resend setup.
+
+**Get Supabase values from:** Supabase Dashboard → Settings → API
 
 ### 2. Set Up Database
 
@@ -31,6 +37,10 @@ Run the migrations in your Supabase SQL Editor (in order):
 - `supabase/migrations/001_initial_schema.sql`
 - `supabase/migrations/002_admin_policies.sql`
 - `supabase/migrations/003_add_website_to_venues.sql`
+- `supabase/migrations/004_community_quotes.sql`
+- `supabase/migrations/005_add_email_fields.sql`
+- `supabase/migrations/006_add_sticker_request_delete_policy.sql`
+- `supabase/migrations/007_add_instagram_handle_to_venues.sql`
 
 ### 3. Create Storage Buckets
 
@@ -71,7 +81,7 @@ To restart the app after closing it:
 
 2. **Verify `.env` file exists:**
    - Check it's in the project root
-   - Verify it has all three variables with actual values
+   - Verify it has the three Supabase variables with actual values (and optionally `VITE_RESEND_API_KEY` for email; see `EMAIL-SETUP.md`)
 
 3. **Start the server:**
    ```bash
@@ -90,10 +100,11 @@ To restart the app after closing it:
 
 **Local:**
 1. Check that `.env` file exists in project root
-2. Verify all three variables are set with actual values (not placeholders):
+2. Verify Supabase variables are set with actual values (not placeholders):
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - (Optional) `VITE_RESEND_API_KEY` for email — see `EMAIL-SETUP.md`
 3. Restart the dev server: Stop it (Ctrl+C) and run `npm run dev` again
 
 **Production (Vercel):**
@@ -108,4 +119,6 @@ To restart the app after closing it:
 
 ## Full Documentation
 
-See `SETUP-INSTRUCTIONS.md` for detailed setup and troubleshooting guide.
+- `SETUP-INSTRUCTIONS.md` — detailed setup and troubleshooting
+- `EMAIL-SETUP.md` — Resend and email notifications (venue/quote approval, sticker “sent”)
+- `README.md` — features, migrations 001–007, admin (EditableMap, Instagram share)

@@ -24,7 +24,13 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-   **Get these from:** Supabase Dashboard → Settings → API
+   For email notifications (venue/quote approval, sticker “sent”), add:
+```bash
+VITE_RESEND_API_KEY=re_your_resend_api_key
+```
+   See `EMAIL-SETUP.md` for details.
+
+   **Get Supabase values from:** Supabase Dashboard → Settings → API
 
 3. **Set up Supabase:**
    - Create a new Supabase project at https://supabase.com
@@ -32,6 +38,10 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
      - `supabase/migrations/001_initial_schema.sql` (creates tables and basic policies)
      - `supabase/migrations/002_admin_policies.sql` (creates admin access policies)
      - `supabase/migrations/003_add_website_to_venues.sql` (adds website field)
+     - `supabase/migrations/004_community_quotes.sql` (community quotes table)
+     - `supabase/migrations/005_add_email_fields.sql` (email on venues, quotes, etc.)
+     - `supabase/migrations/006_add_sticker_request_delete_policy.sql` (admin delete sticker requests)
+     - `supabase/migrations/007_add_instagram_handle_to_venues.sql` (optional Instagram handle on venues)
    - Create two storage buckets in Supabase Storage:
      - `stickers` (set to public)
      - `logos` (set to public)
@@ -78,10 +88,12 @@ npm run dev
 ## Features
 
 - Interactive map showing approved venues
-- Location registration for venues with stickers
+- Location registration for venues with stickers (optional website, email, Instagram handle)
 - Sticker request form
 - Brand endorsement system with approval workflow
-- Admin dashboard for managing approvals
+- Community quotes (“Add your voice”) with approval workflow
+- Admin dashboard for managing approvals, editing venues (including dragging the map pin to fix location), and “Share to Instagram” for approved venues
+- Email notifications (Resend) when venues or quotes are approved, or sticker requests are marked “sent”
 
 ## Design
 
@@ -91,6 +103,14 @@ npm run dev
 - Confetti celebrations on successful actions
 
 ## Recent Changes
+
+### Admin & Venues
+- **Venue edit map:** When editing a venue in admin, an `EditableMap` lets you drag the pin to correct the location; latitude/longitude update and are saved with the venue.
+- **Venue Instagram handle:** Optional field on venue registration and in admin; used when “Share to Instagram” is clicked for an approved venue.
+- **Share to Instagram:** Admin shows a “Share to Instagram” button for approved venues; see `src/utils/instagramShare.js`.
+
+### Email Notifications
+- **Resend:** Venue approval, quote approval, and sticker “sent” trigger emails when `VITE_RESEND_API_KEY` is set and the record has an email. See `EMAIL-SETUP.md`.
 
 ### Styling Updates
 
@@ -127,7 +147,7 @@ For deploying to Vercel with a custom domain, see:
 ## Troubleshooting
 
 ### "Missing Supabase environment variables" error
-- **Local development:** Check that `.env` file exists and has all three variables
+- **Local development:** Check that `.env` file exists and has all three Supabase variables (and `VITE_RESEND_API_KEY` if using email)
 - **Production (Vercel):** Add environment variables in Vercel dashboard → Settings → Environment Variables
 - Restart dev server after updating `.env` file
 

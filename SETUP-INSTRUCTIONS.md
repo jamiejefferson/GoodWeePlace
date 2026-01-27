@@ -6,14 +6,18 @@ Follow these steps to get the application running on your new laptop.
 
 ## Step 1: Create .env File
 
-Create a `.env` file in the project root with your Supabase credentials:
+Create a `.env` file in the project root with your Supabase credentials (and optionally Resend for email):
 
 ```bash
 # Supabase Configuration
 VITE_SUPABASE_URL=your_supabase_project_url_here
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+
+# Optional: email notifications (venue/quote approval, sticker “sent”)
+VITE_RESEND_API_KEY=re_your_resend_api_key_here
 ```
+See `EMAIL-SETUP.md` for Resend setup.
 
 **Where to find these values:**
 1. Go to your [Supabase Dashboard](https://app.supabase.com)
@@ -33,6 +37,10 @@ In your Supabase Dashboard, go to **SQL Editor** and run these migrations in ord
 1. **001_initial_schema.sql** - Creates tables and basic policies
 2. **002_admin_policies.sql** - Creates admin access policies  
 3. **003_add_website_to_venues.sql** - Adds website field to venues
+4. **004_community_quotes.sql** - Community quotes table
+5. **005_add_email_fields.sql** - Email on venues and community_quotes
+6. **006_add_sticker_request_delete_policy.sql** - Admin delete sticker requests
+7. **007_add_instagram_handle_to_venues.sql** - Optional Instagram handle on venues
 
 You can find these files in: `supabase/migrations/`
 
@@ -146,7 +154,7 @@ If starting completely fresh (new machine, cloned repo, etc.):
 - [ ] Project files present (especially `src/`, `package.json`)
 - [ ] `.env` file created with all three Supabase variables
 - [ ] Dependencies installed (`npm install`)
-- [ ] Supabase migrations run (if new database)
+- [ ] Supabase migrations run (001–007, if new database)
 - [ ] Storage buckets created in Supabase
 - [ ] Dev server starts without errors (`npm run dev`)
 - [ ] Site loads at `http://localhost:5173`
@@ -154,15 +162,16 @@ If starting completely fresh (new machine, cloned repo, etc.):
 
 ## Verification Checklist
 
-- [ ] `.env` file created with Supabase credentials
-- [ ] All three migrations run in Supabase SQL Editor
+- [ ] `.env` file created with Supabase credentials (and optionally `VITE_RESEND_API_KEY` for email)
+- [ ] All migrations (001–007) run in Supabase SQL Editor
 - [ ] Storage buckets `stickers` and `logos` created and set to public
 - [ ] Email authentication enabled in Supabase
 - [ ] Development server starts without errors
 - [ ] Application loads at `http://localhost:5173`
 - [ ] Map displays (if venues exist)
-- [ ] Forms can be submitted
+- [ ] Forms can be submitted (venue, sticker request, endorsement, quote)
 - [ ] Admin dashboard accessible at `/admin`
+- [ ] In admin: venue edit shows map with draggable pin; optional Instagram handle; “Share to Instagram” for approved venues
 
 ## Troubleshooting
 
@@ -255,11 +264,20 @@ GoodWeePlace/
 └── .env              # Environment variables (create this!)
 ```
 
+## Admin Features
+
+- **Venue edit:** Edit name, address, website, email, Instagram handle, map location. Use the **Map Location** section to drag the pin to correct the venue position; latitude/longitude update and are saved.
+- **Share to Instagram:** For approved venues, use “Share to Instagram” to open a pre-filled Instagram share flow (requires Instagram handle on the venue).
+- **Sticker requests:** Mark as “sent” or delete; “sent” can trigger an email if the request has an email.
+- **Quotes & endorsements:** Approve/reject; quote approval can send email if the quote has an email.
+
 ## Next Steps
 
 Once the application is running:
-1. Test the venue registration form
+1. Test the venue registration form (optional Instagram handle)
 2. Test the sticker request form
 3. Test the brand endorsement form
-4. Access admin dashboard at `/admin` to approve submissions
-5. Verify venues appear on the map after approval
+4. Test the “Add your voice” / community quotes form
+5. Access admin dashboard at `/admin` to approve submissions and edit venue locations on the map
+6. Verify venues appear on the map after approval
+7. (Optional) Configure Resend and `VITE_RESEND_API_KEY` for email notifications; see `EMAIL-SETUP.md`

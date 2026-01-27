@@ -30,3 +30,6 @@ dist-ssr
 .vercel
 .env*.local
 GoodWeePlace_backup_*
+
+# Local backups (optional: remove this line to track backups in git)
+backups/
