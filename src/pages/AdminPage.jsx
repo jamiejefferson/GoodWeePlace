@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'
 import { celebrate } from '../utils/confetti'
-import { sendVenueApprovalEmail, sendQuoteApprovalEmail, sendStickerRequestEmail } from '../utils/email'
+import { sendVenueApprovalEmail, sendQuoteApprovalEmail } from '../utils/email'
 import { shareToInstagram } from '../utils/instagramShare'
 import EditableMap from '../components/Map/EditableMap'
 
@@ -38,6 +38,7 @@ function AdminPage() {
     email: ''
   })
   const [geocoding, setGeocoding] = useState(false)
+  const [expandedFulfilled, setExpandedFulfilled] = useState({})
 
   useEffect(() => {
     checkUser()
@@ -132,12 +133,19 @@ function AdminPage() {
     setAllVenues(all || [])
 
     // Fetch pending endorsements
-    const { data: endorsements } = await supabase
+    const { data: endorsements, error: endorsementsError } = await supabase
       .from('endorsements')
       .select('*')
       .eq('approved', false)
       .order('created_at', { ascending: false })
-    setPendingEndorsements(endorsements || [])
+
+    if (endorsementsError) {
+      console.error('Error fetching endorsements:', endorsementsError)
+      alert('Error fetching endorsements: ' + endorsementsError.message)
+    } else {
+      console.log('Successfully fetched endorsements:', endorsements?.length || 0)
+      setPendingEndorsements(endorsements || [])
+    }
 
     // Fetch sticker requests
     const { data: requests, error: requestsError } = await supabase
@@ -252,41 +260,11 @@ function AdminPage() {
 
   const updateStickerRequestStatus = async (id, status) => {
     try {
-      // If marking as 'sent', fetch the request to get email and name
-      if (status === 'sent') {
-        const { data: request, error: fetchError } = await supabase
-          .from('sticker_requests')
-          .select('email, name')
-          .eq('id', id)
-          .single()
-
-        if (fetchError) throw fetchError
-
-        // Update the status
-        const { error } = await supabase
-          .from('sticker_requests')
-          .update({ status })
-          .eq('id', id)
-        if (error) throw error
-
-        // Send email notification if email is available
-        if (request?.email) {
-          try {
-            await sendStickerRequestEmail(request.email, request.name)
-          } catch (emailError) {
-            console.error('Error sending sticker request email:', emailError)
-            // Don't fail the status update if email fails
-          }
-        }
-      } else {
-        // For other status updates, just update the status
-        const { error } = await supabase
-          .from('sticker_requests')
-          .update({ status })
-          .eq('id', id)
-        if (error) throw error
-      }
-
+      const { error } = await supabase
+        .from('sticker_requests')
+        .update({ status })
+        .eq('id', id)
+      if (error) throw error
       fetchData()
     } catch (error) {
       alert('Error updating status: ' + error.message)
@@ -988,40 +966,56 @@ function AdminPage() {
             <p>No sticker requests.</p>
           ) : (
             <div style={{ marginTop: '1rem' }}>
-              {stickerRequests.map((request) => (
-                <div
-                  key={request.id}
-                  style={{
-                    border: '1px solid black',
-                    padding: '1rem',
-                    marginBottom: '1rem'
-                  }}
-                >
-                  <h3>{request.name}</h3>
-                  <p><strong>Email:</strong> {request.email}</p>
-                  <p><strong>Address:</strong> {request.address}</p>
-                  {request.message && <p><strong>Message:</strong> {request.message}</p>}
-                  <p><strong>Status:</strong> {request.status}</p>
-                  <p><strong>Requested:</strong> {new Date(request.created_at).toLocaleDateString()}</p>
-                  <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                    <button onClick={() => updateStickerRequestStatus(request.id, 'pending')}>
-                      Mark Pending
-                    </button>
-                    <button onClick={() => updateStickerRequestStatus(request.id, 'sent')}>
-                      Mark Sent
-                    </button>
-                    <button onClick={() => updateStickerRequestStatus(request.id, 'fulfilled')}>
-                      Mark Fulfilled
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteStickerRequest(request.id)}
-                      style={{ color: 'var(--color-trans-blue)' }}
-                    >
-                      Delete
-                    </button>
+              {stickerRequests.map((request) => {
+                const isFulfilled = request.status === 'fulfilled'
+                const isExpanded = expandedFulfilled[request.id]
+
+                return (
+                  <div
+                    key={request.id}
+                    style={{
+                      border: '1px solid black',
+                      padding: isFulfilled && !isExpanded ? '0.75rem 1rem' : '1rem',
+                      marginBottom: '1rem',
+                      cursor: isFulfilled ? 'pointer' : 'default'
+                    }}
+                    onClick={isFulfilled ? () => setExpandedFulfilled(prev => ({ ...prev, [request.id]: !prev[request.id] })) : undefined}
+                  >
+                    {isFulfilled && !isExpanded ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <h3 style={{ margin: 0 }}>&#10003; {request.name}</h3>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteStickerRequest(request.id) }}
+                          style={{ color: 'var(--color-trans-blue)' }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <h3>{isFulfilled ? <>&#10003; {request.name}</> : request.name}</h3>
+                        <p><strong>Email:</strong> {request.email}</p>
+                        <p><strong>Address:</strong> {request.address}</p>
+                        {request.message && <p><strong>Message:</strong> {request.message}</p>}
+                        <p><strong>Requested:</strong> {new Date(request.created_at).toLocaleDateString()}</p>
+                        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                          {!isFulfilled && (
+                            <button onClick={() => updateStickerRequestStatus(request.id, 'fulfilled')}>
+                              Mark Fulfilled
+                            </button>
+                          )}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteStickerRequest(request.id) }}
+                            style={{ color: 'var(--color-trans-blue)' }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </section>
