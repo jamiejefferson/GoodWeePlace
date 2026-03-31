@@ -59,11 +59,11 @@ function AdminPage() {
   // Geocoding function (copied from LocationForm)
   const geocodeAddress = async (address) => {
     try {
-      // Only append "Glasgow, Scotland, UK" if the address doesn't already contain location info
-      const hasLocation = /paisley|glasgow|scotland|uk/i.test(address)
+      // Only append "Scotland, UK" if the address doesn't already contain location info
+      const hasLocation = /paisley|glasgow|edinburgh|scotland|uk/i.test(address)
       const searchQuery = hasLocation
         ? encodeURIComponent(address)
-        : encodeURIComponent(address + ', Glasgow, Scotland, UK')
+        : encodeURIComponent(address + ', Scotland, UK')
 
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}&limit=1&addressdetails=1&extratags=1&namedetails=1`,
@@ -260,9 +260,13 @@ function AdminPage() {
 
   const updateStickerRequestStatus = async (id, status) => {
     try {
+      const updateData = { status }
+      if (status === 'fulfilled') {
+        updateData.fulfilled_at = new Date().toISOString()
+      }
       const { error } = await supabase
         .from('sticker_requests')
-        .update({ status })
+        .update(updateData)
         .eq('id', id)
       if (error) throw error
       fetchData()

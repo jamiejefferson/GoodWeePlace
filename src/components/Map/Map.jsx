@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { useVenues } from '../../hooks/useVenues'
 import { celebrate } from '../../utils/confetti'
@@ -23,12 +23,28 @@ const createCustomIcon = () => {
   })
 }
 
+// Fit map bounds to show all venue markers
+function FitBounds({ venues }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (venues.length === 0) return
+
+    const bounds = L.latLngBounds(
+      venues.map((v) => [v.latitude, v.longitude])
+    )
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 })
+  }, [venues, map])
+
+  return null
+}
+
 function Map() {
   const { venues, loading } = useVenues()
   const [hasCelebrated, setHasCelebrated] = useState(false)
   const mapRef = useRef(null)
 
-  // Glasgow coordinates
+  // Glasgow coordinates (initial center before venues load)
   const glasgowCenter = [55.8642, -4.2518]
 
   // Celebrate when venues are first loaded
@@ -55,6 +71,7 @@ function Map() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <FitBounds venues={venues} />
         {venues.map((venue) => (
           <Marker
             key={venue.id}

@@ -169,6 +169,32 @@ a:hover {
   opacity: 0.7;
 }
 
+/* CTA link - slightly more expressive than default links */
+.cta-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.cta-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s ease;
+}
+
+.cta-link:hover::after {
+  transform: scaleX(1);
+}
+
 /* Buttons - minimal, text-like, Afrika style */
 button {
   font-family: var(--font-family);
@@ -431,6 +457,32 @@ nav a {
  */
 .section-heading {
   font-size: var(--font-size-lg);
+}
+
+/* Horizontal scrollers - subtle affordance */
+.scroll-fade {
+  position: relative;
+}
+
+.scroll-fade::before,
+.scroll-fade::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 42px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scroll-fade::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-white), rgba(242, 240, 239, 0));
+}
+
+.scroll-fade::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-white), rgba(242, 240, 239, 0));
 }
 
 /* ==========================================================================

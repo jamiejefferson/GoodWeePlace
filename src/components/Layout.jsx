@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { motionTokens } from '../motion/motionTokens'
 
 function Layout({ children }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const reduceMotion = useReducedMotion()
 
   const handleRegisterClick = (e) => {
     e.preventDefault()
@@ -68,6 +71,7 @@ function Layout({ children }) {
               position: 'relative'
             }}
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? (
               // Close icon (X)
@@ -115,129 +119,179 @@ function Layout({ children }) {
       </nav>
 
       {/* Full-screen menu overlay */}
-      <div
-        onClick={(e) => {
-          // Close menu if clicking on the overlay background (not on menu items)
-          if (e.target === e.currentTarget) {
-            setIsMenuOpen(false)
-          }
-        }}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'var(--color-white)',
-          zIndex: 1000,
-          display: isMenuOpen ? 'flex' : 'none',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          padding: '2rem',
-          paddingLeft: 'var(--spacing-md)',
-          transition: 'opacity 0.3s ease, visibility 0.3s ease',
-          opacity: isMenuOpen ? 1 : 0,
-          visibility: isMenuOpen ? 'visible' : 'hidden',
-          overflow: 'hidden',
-          overscrollBehavior: 'none'
-        }}
-      >
-        <Link 
-          to="/" 
-          onClick={handleLinkClick}
-          style={{ 
-            display: 'block', 
-            marginBottom: '2rem',
-            textDecoration: 'none'
-          }}
-        >
-          <img 
-            src="/target.png" 
-            alt="Good Wee Place" 
-            style={{ 
-              height: '60px', 
-              width: 'auto',
-              display: 'block'
-            }} 
-          />
-        </Link>
-        <ul style={{
-          listStyle: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          alignItems: 'flex-start',
-          width: '80vw',
-          maxWidth: 'none'
-        }}>
-          <li style={{ margin: 0, padding: 0 }}>
-            <Link
-              to="/what-it-means"
-              onClick={handleLinkClick}
-              style={{
-                fontSize: 'var(--font-size-4xl)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--color-black)',
-                textDecoration: 'none',
-                display: 'block',
-                lineHeight: '1.1',
-                transition: 'opacity 0.2s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsMenuOpen(false)
+            }}
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: motionTokens.duration.base, ease: motionTokens.ease.out }
+            }
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'var(--color-white)',
+              zIndex: 1000,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              padding: '2rem',
+              paddingLeft: 'var(--spacing-md)',
+              overflow: 'hidden',
+              overscrollBehavior: 'none'
+            }}
+          >
+            <motion.div
+              initial={reduceMotion ? false : { y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: motionTokens.duration.base, ease: motionTokens.ease.out, delay: 0.05 }
+              }
             >
-              What's a Good Wee Place?
-            </Link>
-          </li>
-          <li style={{ margin: 0, padding: 0 }}>
-            <button
-              onClick={handleRegisterClick}
-              style={{
-                fontSize: 'var(--font-size-4xl)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--color-black)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                margin: 0,
-                fontFamily: 'inherit',
-                lineHeight: '1.1',
-                textAlign: 'left',
-                transition: 'opacity 0.2s ease'
+              <Link
+                to="/"
+                onClick={handleLinkClick}
+                style={{
+                  display: 'block',
+                  marginBottom: '2rem',
+                  textDecoration: 'none'
+                }}
+              >
+                <img
+                  src="/target.png"
+                  alt="Good Wee Place"
+                  style={{
+                    height: '60px',
+                    width: 'auto',
+                    display: 'block'
+                  }}
+                />
+              </Link>
+            </motion.div>
+
+            <motion.ul
+              initial={reduceMotion ? false : 'hidden'}
+              animate="show"
+              variants={{
+                hidden: {},
+                show: {
+                  transition: { staggerChildren: 0.06, delayChildren: 0.08 },
+                },
               }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              Add Your Venue
-            </button>
-          </li>
-          <li style={{ margin: 0, padding: 0 }}>
-            <button
-              onClick={handleRequestClick}
               style={{
-                fontSize: 'var(--font-size-4xl)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--color-black)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                margin: 0,
-                fontFamily: 'inherit',
-                lineHeight: '1.1',
-                textAlign: 'left',
-                transition: 'opacity 0.2s ease'
+                listStyle: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem',
+                alignItems: 'flex-start',
+                width: '80vw',
+                maxWidth: 'none'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
-              Get Your Sticker
-            </button>
-          </li>
-        </ul>
-      </div>
+              <motion.li
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  show: { opacity: 1, y: 0, transition: { duration: motionTokens.duration.base, ease: motionTokens.ease.out } },
+                }}
+                style={{ margin: 0, padding: 0 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+              >
+                <Link
+                  to="/what-it-means"
+                  onClick={handleLinkClick}
+                  style={{
+                    fontSize: 'var(--font-size-4xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-black)',
+                    textDecoration: 'none',
+                    display: 'block',
+                    lineHeight: '1.1',
+                    transition: 'opacity 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                >
+                  What&apos;s a Good Wee Place?
+                </Link>
+              </motion.li>
+
+              <motion.li
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  show: { opacity: 1, y: 0, transition: { duration: motionTokens.duration.base, ease: motionTokens.ease.out } },
+                }}
+                style={{ margin: 0, padding: 0 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+              >
+                <button
+                  onClick={handleRegisterClick}
+                  style={{
+                    fontSize: 'var(--font-size-4xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-black)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    margin: 0,
+                    fontFamily: 'inherit',
+                    lineHeight: '1.1',
+                    textAlign: 'left',
+                    transition: 'opacity 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                >
+                  Add Your Venue
+                </button>
+              </motion.li>
+
+              <motion.li
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  show: { opacity: 1, y: 0, transition: { duration: motionTokens.duration.base, ease: motionTokens.ease.out } },
+                }}
+                style={{ margin: 0, padding: 0 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+              >
+                <button
+                  onClick={handleRequestClick}
+                  style={{
+                    fontSize: 'var(--font-size-4xl)',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--color-black)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    margin: 0,
+                    fontFamily: 'inherit',
+                    lineHeight: '1.1',
+                    textAlign: 'left',
+                    transition: 'opacity 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                >
+                  Get Your Sticker
+                </button>
+              </motion.li>
+            </motion.ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main>
         {children}

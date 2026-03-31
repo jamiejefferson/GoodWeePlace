@@ -34,11 +34,11 @@ function LocationForm({ onSuccess }) {
   // Simple geocoding - using Nominatim with proper headers and fallback
   const geocodeAddress = async (address) => {
     try {
-      // Only append "Glasgow, Scotland, UK" if the address doesn't already contain location info
-      const hasLocation = /paisley|glasgow|scotland|uk/i.test(address)
+      // Only append "Scotland, UK" if the address doesn't already contain location info
+      const hasLocation = /paisley|glasgow|edinburgh|scotland|uk/i.test(address)
       const searchQuery = hasLocation
         ? encodeURIComponent(address)
-        : encodeURIComponent(address + ', Glasgow, Scotland, UK')
+        : encodeURIComponent(address + ', Scotland, UK')
 
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}&limit=1&addressdetails=1&extratags=1&namedetails=1`,

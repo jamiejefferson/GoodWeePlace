@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../utils/supabase'
+import { motion, useReducedMotion } from 'framer-motion'
+import { motionTokens } from '../../motion/motionTokens'
 
 function EndorsementDisplay({ onEmptySquareClick }) {
   const [endorsements, setEndorsements] = useState([])
   const [loading, setLoading] = useState(true)
   const scrollContainerRef = useRef(null)
+  const reduceMotion = useReducedMotion()
 
   useEffect(() => {
     fetchEndorsements()
@@ -47,7 +50,8 @@ function EndorsementDisplay({ onEmptySquareClick }) {
 
   return (
     <div>
-      <div
+      <div className="scroll-fade">
+        <div
         ref={scrollContainerRef}
         style={{
           display: 'flex',
@@ -68,7 +72,7 @@ function EndorsementDisplay({ onEmptySquareClick }) {
         }}
       >
         {squares.map((square, index) => (
-          <div
+          <motion.div
             key={square.type === 'logo' ? square.endorsement.id : `empty-${index}`}
             onClick={() => {
               if (square.type === 'empty' && onEmptySquareClick) {
@@ -103,6 +107,14 @@ function EndorsementDisplay({ onEmptySquareClick }) {
                 e.currentTarget.style.opacity = '1'
               }
             }}
+            whileHover={
+              reduceMotion
+                ? undefined
+                : square.type === 'empty'
+                  ? { y: -6, transition: motionTokens.spring.playful }
+                  : { y: -3, transition: motionTokens.spring.playful }
+            }
+            whileTap={reduceMotion ? undefined : { scale: 0.98 }}
           >
             {square.type === 'logo' && square.endorsement.logo_url ? (
               <img
@@ -126,8 +138,9 @@ function EndorsementDisplay({ onEmptySquareClick }) {
                 +
               </span>
             )}
-          </div>
+          </motion.div>
         ))}
+        </div>
       </div>
     </div>
   )

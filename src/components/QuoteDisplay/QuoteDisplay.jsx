@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../utils/supabase'
+import { motion, useReducedMotion } from 'framer-motion'
+import { motionTokens } from '../../motion/motionTokens'
 
 function QuoteDisplay({ onEmptyCardClick }) {
   const [quotes, setQuotes] = useState([])
   const [loading, setLoading] = useState(true)
   const scrollContainerRef = useRef(null)
+  const reduceMotion = useReducedMotion()
 
   useEffect(() => {
     fetchQuotes()
@@ -33,7 +36,8 @@ function QuoteDisplay({ onEmptyCardClick }) {
 
   return (
     <div>
-      <div
+      <div className="scroll-fade">
+        <div
         ref={scrollContainerRef}
         style={{
           display: 'flex',
@@ -55,7 +59,7 @@ function QuoteDisplay({ onEmptyCardClick }) {
       >
         {/* Quote cards */}
         {quotes.map((quote) => (
-          <div
+          <motion.div
             key={quote.id}
             style={{
               minWidth: '357px',
@@ -68,6 +72,16 @@ function QuoteDisplay({ onEmptyCardClick }) {
               flexShrink: 0,
               gap: '0.75rem'
             }}
+            whileHover={
+              reduceMotion
+                ? undefined
+                : {
+                    y: -6,
+                    rotate: -0.25,
+                    transition: motionTokens.spring.playful,
+                  }
+            }
+            whileTap={reduceMotion ? undefined : { scale: 0.99 }}
           >
             <p className="text-body-large" style={{ margin: 0, fontSize: '1.25rem' }}>
               "{quote.quote}"
@@ -100,11 +114,11 @@ function QuoteDisplay({ onEmptyCardClick }) {
                 )}
               </div>
             )}
-          </div>
+          </motion.div>
         ))}
 
         {/* Empty card with plus sign - at end */}
-        <div
+        <motion.div
           onClick={onEmptyCardClick}
           style={{
             minWidth: '357px',
@@ -126,6 +140,15 @@ function QuoteDisplay({ onEmptyCardClick }) {
           onMouseLeave={(e) => {
             e.currentTarget.style.opacity = '1'
           }}
+          whileHover={
+            reduceMotion
+              ? undefined
+              : {
+                  y: -6,
+                  transition: motionTokens.spring.playful,
+                }
+          }
+          whileTap={reduceMotion ? undefined : { scale: 0.98 }}
         >
           <span
             style={{
@@ -147,6 +170,7 @@ function QuoteDisplay({ onEmptyCardClick }) {
           >
             Add your voice
           </span>
+        </motion.div>
         </div>
       </div>
     </div>
