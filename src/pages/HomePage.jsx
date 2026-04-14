@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import Reveal from '../motion/Reveal'
 import { motionTokens } from '../motion/motionTokens'
 import Map from '../components/Map/Map'
+import { useVenues } from '../hooks/useVenues'
 import EndorsementDisplay from '../components/EndorsementDisplay/EndorsementDisplay'
 import QuoteDisplay from '../components/QuoteDisplay/QuoteDisplay'
 
@@ -11,6 +12,7 @@ function HomePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const reduceMotion = useReducedMotion()
+  const { venues } = useVenues()
 
   // Handle hash navigation for backward compatibility
   useEffect(() => {
@@ -84,7 +86,7 @@ function HomePage() {
       <section className="section">
         <div className="container">
           <Reveal as={motion.h2} className="section-heading">
-            Find a Good Wee Place
+            {venues.length > 0 ? `Visit one of ${venues.length} Good Wee Places` : 'Find a Good Wee Place'}
           </Reveal>
           <Reveal delay={0.05}>
             <Map />
